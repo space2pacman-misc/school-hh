@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>01</title>
+</head>
+<body>
+	
+<script>
+	function getCombinations(number) {
+		var keyboard = [
+			[1, 2, 3],
+			[4, 5, 6],
+			[7, 8, 9],
+			[null, 0, null]
+		];
+		var pin = number.toString().split("");
+		var combinations = collectNumbers(pin);
+		var counts = makeCounts(combinations);
+		var maxCount = makeMaxCount(combinations);
+		var results = [];
+		var count = 0;
+		var currentCount = 0;
+		var index = 0;
+
+		function collecResult() {
+			while(count != maxCount) {
+				for(var i = 0; i < combinations.length; i++) {
+					if(!results[index]) results[index] = "";
+
+					results[index] += combinations[i][counts[i].value];
+				}
+
+				index++;
+				count++;
+				enigma(counts);
+			}
+		}
+
+		function enigma(data) {
+				if(data[currentCount].value === data[currentCount].maxValue) {
+					
+					if(data[currentCount + 1]) {
+						data[currentCount + 1].value++;
+					}
+
+					for(var i = 1; i < data.length; i++) {
+						if(data[i].value === data[i].maxValue + 1) {
+							if(data[i+1]) {
+								data[i+1].value++;
+							}
+							data[i].value = 0;
+						}
+					}
+
+					data[currentCount].value = 0;
+				} else {
+					data[currentCount].value++;
+				}
+		}
+
+		
+
+		function collectNumbers(pin) {
+			var combinations = [];
+			
+			pin.forEach((number, index, array) => {
+				if(!combinations[index]) combinations[index] = [];
+				
+				for(var i = 0; i < keyboard.length; i++) {
+					for(var j = 0; j < keyboard[i].length; j++) {
+						if(keyboard[i][j] == number) {							
+							if(keyboard[i-1] && keyboard[i-1][j] != null) combinations[index].push(keyboard[i - 1][j])
+							if(keyboard[i+1] && keyboard[i+1][j] != null) combinations[index].push(keyboard[i + 1][j])
+							if(keyboard[i][j-1] != null) combinations[index].push(keyboard[i][j - 1])
+							if(keyboard[i][j+1] != null) combinations[index].push(keyboard[i][j + 1])
+
+							combinations[index].push(Number(number))
+						}
+					}
+				}
+			})
+
+			return combinations;
+		}
+
+		function makeCounts(data) {
+			var result = Array(data.length);
+
+			data.forEach((item, index) => {
+				result[index] = {};
+				result[index].value = 0;
+				result[index].maxValue = item.length - 1;
+			})
+
+			return result;
+		}
+
+		function makeMaxCount(data) {
+			var result = 1;
+
+			data.forEach(item => {
+				result = result * item.length;
+			})
+
+			return result;
+		}
+
+		function init() {
+			collecResult();
+		}
+
+		init();
+
+		return results.sort((a, b) => a-b).join(",")
+	}
+
+	console.log(getCombinations(46));
+	console.log(getCombinations(8));
+	console.log(getCombinations(1357));
+	
+	
+</script>
+
+</body>
+</html>
